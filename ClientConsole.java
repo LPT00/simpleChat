@@ -32,15 +32,12 @@ public class ClientConsole implements ChatIF
   /**
    * The instance of the client that created this ConsoleChat.
    */
-  ChatClient client;
-  
-  
+  ChatClient client;   
   
   /**
    * Scanner to read from the console
    */
   Scanner fromConsole; 
-
   
   //Constructors ****************************************************
 
@@ -50,22 +47,24 @@ public class ClientConsole implements ChatIF
    * @param host The host to connect to.
    * @param port The port to connect on.
    */
-  public ClientConsole(String host, int port) 
+  
+  //added logID here so that we can take the logID as the first parameter in main 
+  
+  public ClientConsole(String logID, String host, int port) 
   {
-    try 
-    {
-      client= new ChatClient(host, port, this);
+    
+     try {
+		client= new ChatClient(logID, host, port, this);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
       
-      
-    } 
-    catch(IOException exception) 
-    {
-      System.out.println("Error: Can't setup connection!"
-                + " Terminating client.");
-      System.exit(1);
-    }
+   
+   
     
     // Create scanner object to read from console
+    //we don't need this anymore now as we have the userID 
     fromConsole = new Scanner(System.in); 
   }
 
@@ -117,18 +116,54 @@ public class ClientConsole implements ChatIF
    */
   public static void main(String[] args) 
   {
-    String host = "";
+	/*
+	 *This is exercise 3a, and here, I added in the logID parameter which will 
+	 *be the first argument added in the console
+	 *
+	 */
+	String logID;
+	
+    String host;
+    
+    int prt;
+    
+    //here, we are initializig the logID to be the first argument given in the console
+    try {
+    	logID = args[0];
+    }
+    catch (ArrayIndexOutOfBoundsException exc) {
+    	System.out.println("ERROR - No login ID specified.  Connection aborted.");
+    	System.exit(1);
+    	return;
+    }
 
 
-    try
-    {
-      host = args[0];
+    try {
+        host = args[1];
     }
-    catch(ArrayIndexOutOfBoundsException e)
-    {
-      host = "localhost";
+    catch(ArrayIndexOutOfBoundsException e) {
+    	host = "localhost";
     }
-    ClientConsole chat= new ClientConsole(host, DEFAULT_PORT);
+    
+    
+    /*
+     * This is part b of question 1. Here, we are accepting the 
+     * input of a port and if no input, use the default port of 5555
+     */
+    try {
+    	prt = Integer.parseInt(args[2]);
+    } 
+    catch (Exception exc) {
+    	prt = DEFAULT_PORT;
+    }
+    
+    /*here we create a new clientconsole object that creates a chatclient instance 
+     * which contains the same parameters
+     */
+    
+    //here we added the logID so that we can create a new object with logID as a parameter
+    //the constructor had to be changed to accomodate this change
+    ClientConsole chat = new ClientConsole(logID, host, prt);
     chat.accept();  //Wait for console data
   }
 }
